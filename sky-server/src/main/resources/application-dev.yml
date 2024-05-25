@@ -9,5 +9,6 @@ sky:
 
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
-  
     bucket-name: sky-itcast0820
+    access-key-id: LTAI5tCZCoXqqterKYZfFUqc
+    access-key-secret: MzhH5EedGKxo6AIRfmo33uA2X304mt

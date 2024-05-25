@@ -119,20 +119,37 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public void starOrStop(Integer status, Long id) {
-        List<Long> ids = new ArrayList<>();
-        ids.add(id);
-        dishMapper.deleteById(ids);
-        List<Long> setmealIdsByDishIds = setmealDishMapper.getSetmealIdsByDishIds(ids);
+        Dish dish = Dish.builder()
+                .id(id)
+                .status(status)
+                .build();
+        dishMapper.update(dish);
 
-        if (setmealIdsByDishIds != null && setmealIdsByDishIds.size() >0){
-            for (Long setmealIdsByDishId : setmealIdsByDishIds) {
-                Setmeal setmeal = new Setmeal();
-                setmeal.setId(setmealIdsByDishId);
-                setmeal.setStatus(status);
-
-                setmealMapper.update(setmeal);
-
+        if (status == StatusConstant.DISABLE) {
+            // 如果是停售操作，还需要将包含当前菜品的套餐也停售
+            List<Long> dishIds = new ArrayList<>();
+            dishIds.add(id);
+            // select setmeal_id from setmeal_dish where dish_id in (?,?,?)
+            List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(dishIds);
+            if (setmealIds != null && setmealIds.size() > 0) {
+                for (Long setmealId : setmealIds) {
+                    Setmeal setmeal = Setmeal.builder()
+                            .id(setmealId)
+                            .status(StatusConstant.DISABLE)
+                            .build();
+                    setmealMapper.update(setmeal);
+                }
             }
         }
+    }
+
+    @Override
+    public List<Dish> list(Long categoryId) {
+        Dish dish = new Dish();
+        dish.setCategoryId(categoryId);
+        dish.setStatus(StatusConstant.ENABLE);
+
+        List<Dish> list = dishMapper.list(dish);
+        return list;
     }
 }
