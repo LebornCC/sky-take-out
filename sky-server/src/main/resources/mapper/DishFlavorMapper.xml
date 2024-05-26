@@ -8,7 +8,7 @@
         dish_flavor (dish_id,name,value)
         values
         <foreach collection="flavors" item="disFlavors" separator=",">
-            (#{disFlavors.dishId}, #{disFlavors.name}, #{disFlavors.vallue})
+            (#{disFlavors.dishId}, #{disFlavors.name}, #{disFlavors.value})
         </foreach>
     </insert>
 
