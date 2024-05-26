@@ -63,6 +63,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 shoppingCart.setAmount(setmeals.get(0).getPrice());
 
             }
+
             shoppingCart.setNumber(1);
             shoppingCart.setCreateTime(LocalDateTime.now());
             shoppingCartMapper.insert(shoppingCart);
