@@ -82,6 +82,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public void subShoppingCart(ShoppingCartDTO shoppingCartDTO) {
+
+
         ShoppingCart shoppingCart = new ShoppingCart();
         BeanUtils.copyProperties(shoppingCartDTO,shoppingCart);
         shoppingCart.setUserId(BaseContext.getCurrentId());
