@@ -18,6 +18,7 @@ import com.sky.service.OrderService;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -171,6 +172,27 @@ public class OrderServiceImpl implements OrderService {
         BeanUtils.copyProperties(orders,orderVO);
         orderVO.setOrderDetailList(orderDetails);
         return orderVO;
+    }
+
+    @Override
+    public void userCancelById(Long id) throws Exception {
+        Orders orders = orderMapper.queryByOrderId(id);
+        if (orders == null){
+            throw new OrderBusinessException(MessageConstant.ALREADY_EXISTS);
+        }
+        if (orders.getStatus() > 2){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Orders orders1 = new Orders();
+        orders1.setId(id);
+        if (orders.getStatus().equals(Orders.TO_BE_CONFIRMED)){
+            orders1.setPayStatus(Orders.REFUND);
+        }
+        orders1.setStatus(Orders.CANCELLED);
+        orders1.setCancelReason("用户取消");
+        orders1.setCancelTime(LocalDateTime.now());
+        orderMapper.update(orders1);
     }
 
 
