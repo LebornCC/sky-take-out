@@ -1,6 +1,7 @@
 package com.sky.mapper;
 
 import com.github.pagehelper.Page;
+import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderVO;
@@ -35,4 +36,10 @@ public interface OrderMapper {
     Orders queryByOrderId(Long orderId);
 
     void update(Orders orders);
+
+    @Select("select count(*) from orders where status = #{status}")
+    Integer queryByStatus(Integer status);
+
+
+
 }
