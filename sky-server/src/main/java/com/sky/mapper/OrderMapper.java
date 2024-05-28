@@ -5,6 +5,7 @@ import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderVO;
+import com.sky.vo.TurnoverReportVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -12,6 +13,7 @@ import org.apache.ibatis.annotations.Update;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
@@ -46,6 +48,8 @@ public interface OrderMapper {
     @Select("select * from orders where number = #{number}")
     Orders queryByNumber(String number);
 
+
+    Double getTurnOver(Map map);
 
 
 }
