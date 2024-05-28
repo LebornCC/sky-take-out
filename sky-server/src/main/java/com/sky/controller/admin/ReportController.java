@@ -3,6 +3,8 @@ package com.sky.controller.admin;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import io.swagger.annotations.Api;
@@ -25,6 +27,8 @@ import java.time.LocalTime;
 public class ReportController {
     @Autowired
     private ReportService reportService;
+
+
     @GetMapping("/turnoverStatistics")
     @ApiOperation("营业额统计")
     public Result<TurnoverReportVO> getturnOver(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
@@ -37,7 +41,29 @@ public class ReportController {
 
     @GetMapping("/userStatistics")
     @ApiOperation("用户统计")
-    public UserReportVO getUserReport(LocalDate begin,LocalDate end){
-
+    public Result<UserReportVO> getUserReport(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+                                              @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
+        log.info("用户统计:{}",begin,end);
+        UserReportVO userReport = reportService.getUserReport(begin, end);
+        return Result.success(userReport);
     }
+
+    @GetMapping("/ordersStatistics")
+    @ApiOperation("订单统计")
+    public Result<OrderReportVO> getOrderReport(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+                                                @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
+        log.info("订单统计:{}",begin,end);
+        OrderReportVO orderReport = reportService.getOrderReport(begin, end);
+        return Result.success(orderReport);
+    }
+
+    @GetMapping("/top10")
+    @ApiOperation("销量tpo10")
+    public Result<SalesTop10ReportVO> getSalesTop10ReportVO(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+                                                            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
+        log.info("订单统计:{}",begin,end);
+        SalesTop10ReportVO salesTop10ReportVO = reportService.getSalesTop10ReportVO(begin, end);
+        return Result.success(salesTop10ReportVO);
+    }
+
 }

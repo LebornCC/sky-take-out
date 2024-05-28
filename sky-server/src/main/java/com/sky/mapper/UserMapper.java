@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Update;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface UserMapper {
@@ -17,6 +18,8 @@ public interface UserMapper {
     User getByOpenid(String openid);
     @Select("select * from user where id = #{id}")
     User getById(Long id);
+
+    Integer getUserReport(Map map);
 
 
 }
