@@ -19,6 +19,11 @@ public interface OrderService {
      */
     OrderPaymentVO payment(OrdersPaymentDTO ordersPaymentDTO) throws Exception;
 
+    /**
+     * 支付成功，修改订单状态
+     * @param outTradeNo
+     */
+    void paySuccess(String outTradeNo);
 
 
     PageResult pageQuery4User(int page, int pageSize,Integer status);
@@ -43,4 +48,6 @@ public interface OrderService {
     void delivery(Long id);
 
     void complete(Long id);
+
+    void reminder(Long id);
 }
