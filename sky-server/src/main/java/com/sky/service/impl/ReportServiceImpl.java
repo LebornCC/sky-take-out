@@ -5,15 +5,20 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.service.WorkspaceService;
+import com.sky.vo.*;
 import io.swagger.models.auth.In;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -27,7 +32,8 @@ import java.util.stream.Collectors;
 public class ReportServiceImpl implements ReportService {
     @Autowired
     private OrderMapper orderMapper;
-
+    @Autowired
+    private WorkspaceService workspaceService;
     @Autowired
     private UserMapper userMapper;
     @Override
@@ -155,5 +161,52 @@ public class ReportServiceImpl implements ReportService {
                 .nameList(nameList)
                 .numberList(numberList)
                 .build();
+    }
+
+    @Override
+    public void exportBusinessData(HttpServletResponse response) {
+        LocalDate beginTime = LocalDate.now().minusDays(30);
+        LocalDate endTime = LocalDate.now().minusDays(1);
+        BusinessDataVO businessData = workspaceService.getBusinessData(LocalDateTime.of(beginTime,LocalTime.MIN), LocalDateTime.of(endTime,LocalTime.MAX));
+
+        try {
+            InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/template.xlsx");
+            XSSFWorkbook excel = new XSSFWorkbook(in);
+            XSSFSheet sheet1 = excel.getSheet("Sheet1");
+            XSSFRow row = sheet1.getRow(1);
+            row.getCell(1).setCellValue("时间"+beginTime+"至"+endTime);
+
+            row = sheet1.getRow(3);
+            row.getCell(2).setCellValue(businessData.getTurnover());
+            row.getCell(4).setCellValue(businessData.getOrderCompletionRate());
+            row.getCell(6).setCellValue(businessData.getNewUsers());
+
+
+            row = sheet1.getRow(4);
+            row.getCell(2).setCellValue(businessData.getValidOrderCount());
+            row.getCell(4).setCellValue(businessData.getUnitPrice());
+
+
+            for (int i = 0; i < 30; i++) {
+                LocalDate now = beginTime.plusDays(i);
+                businessData = workspaceService.getBusinessData(LocalDateTime.of(now, LocalTime.MIN), LocalDateTime.of(now, LocalTime.MAX));
+                row = sheet1.getRow(7+i);
+                row.getCell(1).setCellValue(now.toString());
+                row.getCell(2).setCellValue(businessData.getTurnover());
+                row.getCell(3).setCellValue(businessData.getValidOrderCount());
+                row.getCell(4).setCellValue(businessData.getOrderCompletionRate());
+                row.getCell(5).setCellValue(businessData.getUnitPrice());
+                row.getCell(6).setCellValue(businessData.getNewUsers());
+            }
+            ServletOutputStream outputStream = response.getOutputStream();
+            excel.write(outputStream);
+            outputStream.flush();
+            outputStream.close();
+            excel.close();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+        }
     }
 }
